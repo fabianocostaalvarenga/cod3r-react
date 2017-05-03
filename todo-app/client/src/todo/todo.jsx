@@ -3,6 +3,8 @@ import 'modules/font-awesome/css/font-awesome.css'
 
 import React, { Component } from 'react'
 
+import Header from '../template/header'
+
 export default class Todo extends Component {
 
     constructor(props) {
@@ -12,7 +14,7 @@ export default class Todo extends Component {
     render() {
         return (
             <div>
-                <h1>Todo</h1>
+                <Header title='Tarefas' subtitle='Cadastros...'/>
             </div>
         )
     }
