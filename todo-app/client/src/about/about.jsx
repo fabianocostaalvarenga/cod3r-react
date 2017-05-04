@@ -1,10 +1,10 @@
 import React from 'react'
 
-import Header from '../template/header'
+import PageHeader from '../template/pageHeader'
 
 export default props => (
     <div>
-        <Header title='Sobre' subtitle='Nós'/>
+        <PageHeader title='Sobre' subtitle='Nós'/>
 
         <h3>Nossa História:</h3>
         <p>Descreva a história da empresa...</p>

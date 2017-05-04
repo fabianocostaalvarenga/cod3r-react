@@ -3,7 +3,9 @@ import 'modules/font-awesome/css/font-awesome.css'
 
 import React, { Component } from 'react'
 
-import Header from '../template/header'
+import PageHeader from '../template/pageHeader'
+import TodoForm from './todoForm'
+import TodoList from './todoList'
 
 export default class Todo extends Component {
 
@@ -14,7 +16,8 @@ export default class Todo extends Component {
     render() {
         return (
             <div>
-                <Header title='Tarefas' subtitle='Cadastros...'/>
+                <PageHeader title='Tarefas' subtitle='Cadastros...'/>
+                <TodoForm />
             </div>
         )
     }
