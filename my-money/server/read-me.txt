@@ -1,0 +1,152 @@
+1 - Cria o arquivo package.json (-y = responde as perguntas automaticamente):
+
+	npm init -y
+
+2 - Instalando as dependências de Produção:
+
+	npm install --save express@4.14.0 mongoose@4.7.0 body-parser@1.15.2 lodash@4.17.4 mongoose-paginate@5.0.3 express-query-int@1.0.1 node-restful@0.2.5 pm2@2.1.5
+
+3 - Instalando as dependências de Desenvolvimento:
+
+	npm i --save-dev nodemon@1.11.0
+
+4 - Configurando os scripts de Desenvolvimento e Produção:
+
+	Editar a parte do arquivo package.json ("scripts") conforme abaixo:
+
+	  "scripts": {
+	    "dev": "nodemon",
+	    "production": "pm2 start src/loader.js --name my-money-server"
+	  },
+
+5 - Criando o arquivo .gitignore:
+
+	Crie um arquivo chamado .gitignore e adicione a ele as linhas abaixo:
+
+	node_modules
+	*.log
+
+6 - Criando o server:
+
+	Crie um pasta src/ e dentro dela crie um arquivo com o nome "loader.js" com o conteúdo abaixo:
+
+	require('./config/server')
+
+	Crie uma pasta src/config/ e dentro dela crie um arquivo com o nome "server.js"
+
+	Adicione as seguintes linhas abaixo ao arquivo "server.js":
+
+	const port = 3003
+
+	const bodyParser = require('body-parser')
+	const express = require('express')
+	const server = express()
+
+	server.use(bodyParser.urlencoded({ extended: true }))
+	server.use(bodyParser.json())
+
+	server.listen(port, function() {
+			console.log(`SERVER is running on port ${port}...`)
+	})
+
+	Em seguide teste executando o seguinte comando: npm run dev
+
+7 - Conectando o MongoDB:
+
+	Crie um arquivo com o nome "database.js" dentro da pasta src/config/ com o conteúdo abaixo:
+
+	const mongoose = require('mongoose')
+	mongoose.Promise = global.Promise
+
+	module.exports = mongoose.connect('mongodb://localhost/mymoney')
+
+	Após a criaçao do arquivo acima, edite o arquivo "loader.js" e adicione a seguinte linha abaixo:
+
+	require('./config/database')
+
+	Após salvar esta alterações, caso o mongoDB não esteja iniciado, um erro será lançado. Caso o mongoDB esteja iniciado,
+	ao salvar esta alteração no arquivo "loader.js", a aplicação será atualizada já com a conexão ao mongoDB feita com 
+	sucesso.
+
+8 - Criando o Mapeamento (ODM - Mapeamento Objeto-Documento)
+
+	Crie uma pasta chamada src/api/billingCycle/, e dentro dela crie um arquivo chamado "billingCycle.js" conforme conteúdo
+	abaixo:
+
+	const restful = require('node-restful')
+	const mongoose = restful.mongoose
+
+	const creditSchema = new mongoose.Schema({
+			name: {type: String, required: true},
+			value: {type: Number, min: 0, required: true}
+	})
+
+	const debtSchema = new mongoose.Schema({
+			name: {type: String, required: true},
+			value: {type: Number, min: 0, required: true},
+			status: {type: String, required: false, uppercase: true, enum: ['PAGO', 'PENDENTE', 'AGENDADO']}
+	})
+
+	const billingCycleSchema = new mongoose.Schema({
+			name: {type: String, required: true},
+			month: {type: Number, min: 1, max: 12, required: true},
+			year: {type: Number, min: 1970, max: 2200, required: true},
+			credits: [creditSchema],
+			debits: [debtSchema]
+	})
+
+	module.exports = restful.model('BillingCycle', billingCycleSchema)
+
+9 - Criando o serviço Rest da aplicação:
+
+	Crie um novo arquivo chamado "billingCycleService.js" dentro da pasta src/api/billingCycle conforme conteúdo abaixo:
+
+	const BillingCycle = require('./billingCycle')
+
+	BillingCycle.methods(['get', 'post', 'put', 'delete'])
+	BillingCycle.updateOptions({new: true, runValidators: true})
+
+	module.exports = BillingCycle
+
+10 - Criação das Rotas:
+
+	Crie um novo arquivo chamado "routes.js" dentro da pasta src/config conforme conteúdo abaixo:
+
+	const express = require('express')
+
+	module.exports = function(server) {
+
+			// URL Base para todas as rotas
+			const router = express.Router()
+			server.use('/api', router)
+
+			// Rotas de ciclo de pagamento
+			const BillingCycle = require('../api/billingCycle/billingCycleService')
+			BillingCycle.register(router, '/billingCycles')
+			
+	}
+
+	Em seguida, altere o arquivo "loader.js" para que fique conforme abaixo:
+
+	const server = require('./config/server')
+	require('./config/database')
+	require('./config/routes')(server)
+
+	Altere também o arquivo "server.js" para que ao final seu conteúdo seja como abaixo:
+
+	const port = 3003
+
+	const bodyParser = require('body-parser')
+	const express = require('express')
+	const server = express()
+
+	server.use(bodyParser.urlencoded({ extended: true }))
+	server.use(bodyParser.json())
+
+	server.listen(port, function() {
+			console.log(`SERVER is running on port ${port}...`)
+	})
+
+	module.exports = server
+
+11 - 
