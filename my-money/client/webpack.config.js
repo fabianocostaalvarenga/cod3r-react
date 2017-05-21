@@ -16,13 +16,13 @@ module.exports = {
         alias: {
             modules: __dirname + '/node_modules',
             jquery: 'modules/admin-lte/plugins/jQuery/jquery-2.2.3.min.js',
-            bootstrap: 'modules/admin-lte/bootstrap/js/bootstrap.js'
+            bootstrap: 'modules/admin-lte/bootstrap/js/bootstrap.min.js'
         }
     },
     plugins: [ 
         new webpack.ProvidePlugin({
             $: 'jquery',
-            jQuery: 'query',
+            jQuery: 'jquery',
             'window.jQuery': 'jquery'
         }),
         new ExtractTextPlugin('app.css')
